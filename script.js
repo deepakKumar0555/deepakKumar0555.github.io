@@ -161,10 +161,26 @@ document.addEventListener("DOMContentLoaded", () => {
         let outlineX = mouseX;
         let outlineY = mouseY;
         
+        let activeChar = null;
         const updateCursor = (e) => {
             if (e.touches && e.touches.length > 0) {
                 mouseX = e.touches[0].clientX;
                 mouseY = e.touches[0].clientY;
+                
+                const elem = document.elementFromPoint(mouseX, mouseY);
+                if (elem) {
+                    const charWrapper = elem.closest('.char-wrapper');
+                    const char = charWrapper ? charWrapper.querySelector('.char') : null;
+                    
+                    if (char && char !== activeChar) {
+                        if (activeChar) gsap.to(activeChar, { yPercent: 0, duration: 0.35, ease: "power3.inOut" });
+                        activeChar = char;
+                        gsap.to(activeChar, { yPercent: -100, duration: 0.35, ease: "power3.inOut" });
+                    } else if (!char && activeChar) {
+                        gsap.to(activeChar, { yPercent: 0, duration: 0.35, ease: "power3.inOut" });
+                        activeChar = null;
+                    }
+                }
             } else {
                 mouseX = e.clientX;
                 mouseY = e.clientY;
@@ -175,6 +191,12 @@ document.addEventListener("DOMContentLoaded", () => {
         window.addEventListener('pointermove', updateCursor);
         window.addEventListener('touchmove', updateCursor, { passive: true });
         window.addEventListener('touchstart', updateCursor, { passive: true });
+        window.addEventListener('touchend', () => {
+            if (activeChar) {
+                gsap.to(activeChar, { yPercent: 0, duration: 0.35, ease: "power3.inOut" });
+                activeChar = null;
+            }
+        });
         
         gsap.ticker.add(() => {
             outlineX += (mouseX - outlineX) * 0.15;
