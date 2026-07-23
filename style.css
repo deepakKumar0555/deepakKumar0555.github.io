@@ -48,22 +48,19 @@ a {
     background: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
 }
 
-.bg-gradient {
+.bg-animated {
     position: fixed;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle at 50% 50%, rgba(30, 30, 30, 0.4), transparent 60%);
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
     z-index: 0;
+    background-color: var(--bg-color);
     pointer-events: none;
-    animation: pulseGradient 20s infinite alternate ease-in-out;
 }
 
-@keyframes pulseGradient {
-    0% { transform: scale(1) translate(0, 0); }
-    100% { transform: scale(1.05) translate(1%, 1%); }
-}
+
 
 .cursor-dot, .cursor-outline {
     position: fixed;
@@ -233,8 +230,17 @@ a {
 }
 
 .char {
+    position: relative;
     display: inline-block;
     transform: translateY(115%);
+}
+
+.char::after {
+    content: attr(data-char);
+    position: absolute;
+    left: 0;
+    top: 100%;
+    color: var(--text-primary);
 }
 
 .hero-subtitle {
@@ -380,7 +386,7 @@ a {
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
-    .bg-gradient, .status-dot, .marquee-content {
+    .status-dot, .marquee-content {
         animation: none !important;
     }
 }

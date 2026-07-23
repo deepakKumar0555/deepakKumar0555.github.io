@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (char === ' ') {
             heroTitle.innerHTML += `<span class="char-wrapper" style="width: 0.2em; display: inline-block;">&nbsp;</span>`;
         } else {
-            heroTitle.innerHTML += `<span class="char-wrapper"><span class="char">${char}</span></span>`;
+            heroTitle.innerHTML += `<span class="char-wrapper"><span class="char" data-char="${char}">${char}</span></span>`;
         }
     });
 
@@ -83,7 +83,73 @@ document.addEventListener("DOMContentLoaded", () => {
     updateTime();
     setInterval(updateTime, 1000);
 
-    // 5. Custom Cursor & Magnetic Effect
+    // 5. Canvas Particle Network
+    const canvas = document.getElementById('bg-canvas');
+    if (canvas && !prefersReducedMotion) {
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.8;
+                this.vy = (Math.random() - 0.5) * 0.8;
+                this.radius = Math.random() * 1.5 + 0.5;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > width) this.vx = -this.vx;
+                if (this.y < 0 || this.y > height) this.vy = -this.vy;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < (window.innerWidth < 768 ? 40 : 80); i++) {
+            particles.push(new Particle());
+        }
+
+        function animateBg() {
+            ctx.clearRect(0, 0, width, height);
+            
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${0.15 - dist/1000})`;
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateBg);
+        }
+        animateBg();
+    }
+
+    // 6. Custom Cursor & Magnetic Effect
     const cursorDot = document.querySelector('.cursor-dot');
     const cursorOutline = document.querySelector('.cursor-outline');
     const hoverTargets = document.querySelectorAll('.hover-target');
@@ -145,12 +211,15 @@ document.addEventListener("DOMContentLoaded", () => {
         
         const charWrappers = document.querySelectorAll('.char-wrapper');
         charWrappers.forEach(wrapper => {
-            wrapper.addEventListener('mouseenter', () => {
-                gsap.to(wrapper, { y: -10, duration: 0.3, ease: "back.out(1.5)" });
-            });
-            wrapper.addEventListener('mouseleave', () => {
-                gsap.to(wrapper, { y: 0, duration: 0.4, ease: "power2.out" });
-            });
+            const char = wrapper.querySelector('.char');
+            if (char) {
+                wrapper.addEventListener('mouseenter', () => {
+                    gsap.to(char, { yPercent: -100, duration: 0.35, ease: "power3.inOut" });
+                });
+                wrapper.addEventListener('mouseleave', () => {
+                    gsap.to(char, { yPercent: 0, duration: 0.35, ease: "power3.inOut" });
+                });
+            }
         });
         
         const heroNameContainer = document.querySelector('.hero-name-container');
