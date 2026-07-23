@@ -155,15 +155,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const hoverTargets = document.querySelectorAll('.hover-target');
     const magneticLinks = document.querySelectorAll('.magnetic-link');
     
-    const isFinePointer = window.matchMedia('(pointer: fine)').matches;
-    
-    if (isFinePointer && !prefersReducedMotion) {
+    if (!prefersReducedMotion) {
         let mouseX = window.innerWidth / 2;
         let mouseY = window.innerHeight / 2;
         let outlineX = mouseX;
         let outlineY = mouseY;
         
-        window.addEventListener('mousemove', (e) => {
+        window.addEventListener('pointermove', (e) => {
             mouseX = e.clientX;
             mouseY = e.clientY;
             
@@ -223,7 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         
         const heroNameContainer = document.querySelector('.hero-name-container');
-        window.addEventListener('mousemove', (e) => {
+        window.addEventListener('pointermove', (e) => {
             const x = (e.clientX / window.innerWidth - 0.5) * 20; 
             const y = (e.clientY / window.innerHeight - 0.5) * 10;
             

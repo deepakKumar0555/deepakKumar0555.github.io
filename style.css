@@ -93,9 +93,6 @@ a {
     border-color: transparent;
 }
 
-@media (pointer: coarse) {
-    .cursor-dot, .cursor-outline { display: none; }
-}
 
 @media (pointer: fine) {
     *, ::before, ::after {
