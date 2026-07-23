@@ -161,12 +161,20 @@ document.addEventListener("DOMContentLoaded", () => {
         let outlineX = mouseX;
         let outlineY = mouseY;
         
-        window.addEventListener('pointermove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            
+        const updateCursor = (e) => {
+            if (e.touches && e.touches.length > 0) {
+                mouseX = e.touches[0].clientX;
+                mouseY = e.touches[0].clientY;
+            } else {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            }
             gsap.set(cursorDot, { x: mouseX, y: mouseY });
-        });
+        };
+        
+        window.addEventListener('pointermove', updateCursor);
+        window.addEventListener('touchmove', updateCursor, { passive: true });
+        window.addEventListener('touchstart', updateCursor, { passive: true });
         
         gsap.ticker.add(() => {
             outlineX += (mouseX - outlineX) * 0.15;
@@ -221,9 +229,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         
         const heroNameContainer = document.querySelector('.hero-name-container');
-        window.addEventListener('pointermove', (e) => {
-            const x = (e.clientX / window.innerWidth - 0.5) * 20; 
-            const y = (e.clientY / window.innerHeight - 0.5) * 10;
+        const updateParallax = (e) => {
+            let clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
+            let clientY = e.touches && e.touches.length > 0 ? e.touches[0].clientY : e.clientY;
+            const x = (clientX / window.innerWidth - 0.5) * 20; 
+            const y = (clientY / window.innerHeight - 0.5) * 10;
             
             gsap.to(heroNameContainer, {
                 x: x,
@@ -231,6 +241,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 duration: 1.5,
                 ease: "power2.out"
             });
-        });
+        };
+        window.addEventListener('pointermove', updateParallax);
+        window.addEventListener('touchmove', updateParallax, { passive: true });
     }
 });
